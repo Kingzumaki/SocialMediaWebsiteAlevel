@@ -1,0 +1,103 @@
+
+{% extends "layout.html" %}
+{% block content %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+  <article class="media content-section">
+  <img class = "rounded-circle article-img" src = "{{ url_for('static', filename = 'webby_pics/' + post.author.image_file)}}">
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="{{ url_for('users.user_post', username=post.author.username) }}">{{ post.author.username }}</a>
+      <!-- This outputs the username of the post -->
+      <small class="text-muted">{{ post.date_posted.strftime('%a-%d-%m-%Y') }}</small>
+      <!-- https://docs.python.org/2/library/time.html -->
+
+       
+
+      {% if post.author == current_user %}
+        <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.edit_post', post_id=post.id) }}">Edit</a>
+
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+            
+            
+          </div>
+      {% endif %}
+
+
+    </div>
+    <h2 class="article-title">{{ post.title }}</h2>
+    <p class="article-content">{{ post.content }}</p>
+
+
+
+    <div>
+
+      {{ post.likes.count() }} likes
+
+    </div>
+
+
+
+    <div>
+
+    {% if current_user.has_liked_post(post) %}
+    <a class="btn btn-danger btn-sm mt-1 mb-1" href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
+    {% else %}
+    <a class="btn btn-info btn-sm mt-1 mb-1" href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}"><span class="glyphicon glyphicon-thumbs-up"></span> Like</a>
+
+    {% endif %}
+</div>
+    
+  
+
+<a href="{{ url_for('posts.post', post_id=post.id) }}#comments">
+  <span class="label label-primary">{{ post.comments.count() }} Comments</span>
+  </a>
+
+
+
+
+
+  {% include 'comments.html' %}
+
+
+  {% if current_user.is_authenticated %}
+
+
+  <div class="comment-form">
+    {{ wtf.quick_form(form) }}
+  </div>
+
+  {% else %}
+
+  <a href="{{url_for('users.signup')}}"> If you want to comment and dont have an account , Signup?</a>
+
+  {% endif %}
+
+  </div>
+</article>
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+  
+
+
+

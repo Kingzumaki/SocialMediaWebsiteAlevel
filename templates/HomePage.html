@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<article class="media content-section">
+<div align="center">
+<div>
+
+<h1>Welcome to TheScholarSpace </h1> 
+
+{% if current_user.is_authenticated %}
+
+
+   <img  src = "{{ url_for('static', filename = 'webby_pics/' + current_user.image_file)}}" height="200" width="200">
+    <div class="media-body">
+      <h2 class="account-heading">{{ current_user.username }}</h2>
+      <p class="text-secondary">{{ current_user.email }}</p>
+      <p class="uk-margin-remove">{{ current_user.followers.count() }} followers, {{ current_user.followed.count() }} following.</p>
+
+
+      <a class="mr-2" href="{{ url_for('users.user_post', username=current_user.username) }}">Check out Profile Page</a>
+
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('main.show_all') }}">All | </a></li>
+        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('main.show_followed') }}"> Following</a></li>
+    </ul>
+    {% for post in posts %}
+        <article class="media content-section">
+            <div class="article-metadata">
+              <div>
+                <img class = "rounded-circle article-img" src = "{{ url_for('static', filename = 'webby_pics/' + post.author.image_file)}}">
+              <a class="mr-2" href="{{ url_for('users.user_post', username=post.author.username) }}">{{ post.author.username }}</a>
+              <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+            <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+          </div>
+        </article>
+    {% endfor %}</div>
+	{% else %}
+	<small class="text-muted">
+            Sign Up to access Account hub ? <a class="ml-2" href="{{ url_for('users.signup') }}">Sign Up</a>
+	{% endif %}
+	
+
+
+	
+{% endblock content %}
